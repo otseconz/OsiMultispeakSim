@@ -1,0 +1,1809 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="OMS_MultiSpeak_v41" targetNamespace="http://www.multispeak.org/Version_4.1_Release" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:gml="gml_V4.1_Release" xmlns:tns="http://www.multispeak.org/Version_4.1_Release" xmlns:cpsm="cpsm_V4.1_Release" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.multispeak.org/Version_4.1_Release">
+
+      <xs:import namespace="cpsm_V4.1_Release"/>
+      <xs:import namespace="gml_V4.1_Release"/>
+
+      <xs:element name="MultiSpeakMsgHeader" type="tns:MultiSpeakMsgHeader"/>
+      <xs:complexType name="MultiSpeakMsgHeader">
+        <xs:attribute name="MajorVersion" type="xs:integer"/>
+        <xs:attribute name="MinorVersion" type="xs:integer"/>
+        <xs:attribute name="Build" type="xs:integer"/>
+        <xs:attribute name="BuildString" type="tns:BuildDescriptor" use="required"/>
+        <xs:attribute name="UserID" type="xs:string"/>
+        <xs:attribute name="Pwd" type="xs:string"/>
+        <xs:attribute name="Company" type="xs:string"/>
+        <xs:attribute name="TimeStamp" type="xs:dateTime"/>
+        <xs:anyAttribute/>
+      </xs:complexType>
+      <xs:simpleType name="BuildDescriptor">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="PR"/>
+          <xs:enumeration value="RC"/>
+          <xs:enumeration value="Branch"/>
+          <xs:enumeration value="Release"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:complexType name="ArrayOfErrorObject">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="errorObject" nillable="true" type="tns:errorObject"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="errorObject">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="objectID" type="xs:string"/>
+            <xs:attribute name="errorString" type="xs:string"/>
+            <xs:attribute name="nounType" type="xs:string"/>
+            <xs:attribute name="eventTime" type="xs:dateTime"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfString">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="string" nillable="true" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="meterID">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="meterNo" type="xs:string"/>
+            <xs:attribute name="serviceType" type="tns:serviceType"/>
+            <xs:attribute name="objectID" type="xs:string"/>
+            <xs:attribute name="utility" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:simpleType name="serviceType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Electric"/>
+          <xs:enumeration value="Gas"/>
+          <xs:enumeration value="Water"/>
+          <xs:enumeration value="Propane"/>
+          <xs:enumeration value="Refuse"/>
+          <xs:enumeration value="Sewer"/>
+          <xs:enumeration value="Telecom"/>
+          <xs:enumeration value="TV"/>
+          <xs:enumeration value="Cable"/>
+          <xs:enumeration value="Heating"/>
+          <xs:enumeration value="Steam"/>
+          <xs:enumeration value="Transportation"/>
+          <xs:enumeration value="All"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:element name="PingURL">
+        <xs:complexType/>
+      </xs:element>
+      <xs:element name="PingURLResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="PingURLResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="GetMethods">
+        <xs:complexType/>
+      </xs:element>
+      <xs:element name="GetMethodsResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="GetMethodsResult" type="tns:ArrayOfString"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="InitiateOutageDetectionEventRequest">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="meterIDs" type="tns:ArrayOfMeterID1"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="requestDate" type="xs:dateTime"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="responseURL" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="transactionID" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="expTime" type="tns:expirationTime"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="InitiateOutageDetectionEventRequestResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="InitiateOutageDetectionEventRequestResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfMeterID1">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="meterID" nillable="true" type="tns:meterID"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="expirationTime">
+        <xs:simpleContent>
+          <xs:extension base="tns:time"/>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:complexType name="time">
+        <xs:simpleContent>
+          <xs:extension base="xs:float">
+            <xs:attribute name="units" type="tns:timeUnits"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:simpleType name="timeUnits">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Milliseconds"/>
+          <xs:enumeration value="Seconds"/>
+          <xs:enumeration value="Minutes"/>
+          <xs:enumeration value="Hours"/>
+          <xs:enumeration value="Days"/>
+          <xs:enumeration value="Weeks"/>
+          <xs:enumeration value="Months"/>
+          <xs:enumeration value="Years"/>
+          <xs:enumeration value="Other"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:element name="ODEventNotification">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="ODEvents" type="tns:ArrayOfOutageDetectionEvent"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="transactionID" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfOutageDetectionEvent">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="outageDetectionEvent" nillable="true" type="tns:outageDetectionEvent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="ODEventNotificationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="ODEventNotificationResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="outageDetectionEvent">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="phaseCode" type="tns:phaseCode"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="eventTime" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageEventType" type="tns:outageEventType"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageDetectionDeviceID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageDetectionDeviceType" type="tns:outageDetectDeviceType"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageLocation" type="tns:outageLocation"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="messageList" type="tns:ArrayOfMessage"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageCustomer" type="tns:outageCustomer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="priority" type="tns:priorityType"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="percentConfident" type="xs:integer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="problemCode" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="resolvedLevel" type="tns:resolvedLevel"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="comments" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType abstract="true" name="mspObject">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="extensions" type="tns:extensions"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="comments" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="extensionsList" type="tns:ArrayOfExtensionsItem"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="objectName" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="identifiedObject" type="cpsm:IdentifiedObject"/>
+        </xs:sequence>
+        <xs:attribute name="objectID" type="xs:string"/>
+        <xs:attribute default="Change" name="verb" type="tns:action"/>
+        <xs:attribute name="errorString" type="xs:string"/>
+        <xs:attribute name="replaceID" type="xs:string"/>
+        <xs:attribute name="utility" type="xs:string"/>
+        <xs:anyAttribute/>
+      </xs:complexType>
+      <xs:complexType name="extensions">
+        <xs:sequence>
+          <xs:any maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfExtensionsItem">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="extensionsItem" type="tns:extensionsItem"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="extensionsItem">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="extName" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="extValue" type="tns:extValue"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="extType" type="tns:extType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="extValue">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="units" type="tns:uom"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:simpleType name="uom">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Acre ft"/>
+          <xs:enumeration value="Amps"/>
+          <xs:enumeration value="Amps RMS"/>
+          <xs:enumeration value="Amps squared RMS"/>
+          <xs:enumeration value="atmospheres"/>
+          <xs:enumeration value="Bar"/>
+          <xs:enumeration value="ccf"/>
+          <xs:enumeration value="ccf per Hr"/>
+          <xs:enumeration value="cm"/>
+          <xs:enumeration value="Corrosion"/>
+          <xs:enumeration value="Counter"/>
+          <xs:enumeration value="cubic feet"/>
+          <xs:enumeration value="cubic feet corrected"/>
+          <xs:enumeration value="cubic feet per Hr"/>
+          <xs:enumeration value="cubic feet per Hr corrected"/>
+          <xs:enumeration value="cubic feet per Hr uncorrected"/>
+          <xs:enumeration value="cubic feet uncorrected"/>
+          <xs:enumeration value="cubic meter"/>
+          <xs:enumeration value="cubic meter per Hr"/>
+          <xs:enumeration value="cubic meters corrected"/>
+          <xs:enumeration value="cubic meters per Hr corrected"/>
+          <xs:enumeration value="cubic meters per Hr uncorrected"/>
+          <xs:enumeration value="cubic meters uncorrected"/>
+          <xs:enumeration value="Current phase angle"/>
+          <xs:enumeration value="Date"/>
+          <xs:enumeration value="Date time"/>
+          <xs:enumeration value="deg C"/>
+          <xs:enumeration value="deg F"/>
+          <xs:enumeration value="deg K"/>
+          <xs:enumeration value="Differential pascal"/>
+          <xs:enumeration value="Differential pound per square inch"/>
+          <xs:enumeration value="dm"/>
+          <xs:enumeration value="Dollar"/>
+          <xs:enumeration value="feet per second"/>
+          <xs:enumeration value="Frequency"/>
+          <xs:enumeration value="ft"/>
+          <xs:enumeration value="ft of water"/>
+          <xs:enumeration value="GQ"/>
+          <xs:enumeration value="GQh"/>
+          <xs:enumeration value="Gram square cm"/>
+          <xs:enumeration value="GVA"/>
+          <xs:enumeration value="GVAh"/>
+          <xs:enumeration value="GVAR"/>
+          <xs:enumeration value="GVARh"/>
+          <xs:enumeration value="GW"/>
+          <xs:enumeration value="GWh"/>
+          <xs:enumeration value="IMP gl"/>
+          <xs:enumeration value="IMP gl per Hr"/>
+          <xs:enumeration value="inches"/>
+          <xs:enumeration value="Inches H2O column"/>
+          <xs:enumeration value="Inches HG column"/>
+          <xs:enumeration value="inches of water"/>
+          <xs:enumeration value="Interval timer"/>
+          <xs:enumeration value="Ionization"/>
+          <xs:enumeration value="Joules"/>
+          <xs:enumeration value="Joules per Hr"/>
+          <xs:enumeration value="kAmps"/>
+          <xs:enumeration value="kAmps RMS"/>
+          <xs:enumeration value="kAmps squared RMS"/>
+          <xs:enumeration value="kJoules"/>
+          <xs:enumeration value="kJoules per Hr"/>
+          <xs:enumeration value="km"/>
+          <xs:enumeration value="km per hour"/>
+          <xs:enumeration value="km per second"/>
+          <xs:enumeration value="kQ"/>
+          <xs:enumeration value="kQh"/>
+          <xs:enumeration value="kV"/>
+          <xs:enumeration value="kV RMS"/>
+          <xs:enumeration value="kVA"/>
+          <xs:enumeration value="kVAh"/>
+          <xs:enumeration value="kVAR"/>
+          <xs:enumeration value="kVARh"/>
+          <xs:enumeration value="kVsquared RMS"/>
+          <xs:enumeration value="kW"/>
+          <xs:enumeration value="kWh"/>
+          <xs:enumeration value="liters"/>
+          <xs:enumeration value="m"/>
+          <xs:enumeration value="m per second"/>
+          <xs:enumeration value="mAmps"/>
+          <xs:enumeration value="Mamps"/>
+          <xs:enumeration value="mAmps RMS"/>
+          <xs:enumeration value="Mamps RMS"/>
+          <xs:enumeration value="Mamps squared RMS"/>
+          <xs:enumeration value="mAmps squared RMS"/>
+          <xs:enumeration value="Meter HG column"/>
+          <xs:enumeration value="micro m"/>
+          <xs:enumeration value="microAmps"/>
+          <xs:enumeration value="microAmps RMS"/>
+          <xs:enumeration value="microAmps squared RMS"/>
+          <xs:enumeration value="microJoules"/>
+          <xs:enumeration value="microJoules per Hr"/>
+          <xs:enumeration value="microQ"/>
+          <xs:enumeration value="microQh"/>
+          <xs:enumeration value="microV"/>
+          <xs:enumeration value="microV RMS"/>
+          <xs:enumeration value="microVA"/>
+          <xs:enumeration value="microVAh"/>
+          <xs:enumeration value="microVAR"/>
+          <xs:enumeration value="microVARh"/>
+          <xs:enumeration value="microVsquared RMS"/>
+          <xs:enumeration value="microW"/>
+          <xs:enumeration value="microWh"/>
+          <xs:enumeration value="Minutes on battery"/>
+          <xs:enumeration value="mJoules"/>
+          <xs:enumeration value="MJoules"/>
+          <xs:enumeration value="MJoules per Hr"/>
+          <xs:enumeration value="mJoules per Hr"/>
+          <xs:enumeration value="mm"/>
+          <xs:enumeration value="mph"/>
+          <xs:enumeration value="MQ"/>
+          <xs:enumeration value="mQ"/>
+          <xs:enumeration value="MQh"/>
+          <xs:enumeration value="mQh"/>
+          <xs:enumeration value="MV"/>
+          <xs:enumeration value="mV"/>
+          <xs:enumeration value="MV RMS"/>
+          <xs:enumeration value="mV RMS"/>
+          <xs:enumeration value="mVA"/>
+          <xs:enumeration value="MVA"/>
+          <xs:enumeration value="MVAh"/>
+          <xs:enumeration value="mVAh"/>
+          <xs:enumeration value="MVAR"/>
+          <xs:enumeration value="mVAR"/>
+          <xs:enumeration value="mVARh"/>
+          <xs:enumeration value="MVARh"/>
+          <xs:enumeration value="mVsquared RMS"/>
+          <xs:enumeration value="MVsquared RMS"/>
+          <xs:enumeration value="MW"/>
+          <xs:enumeration value="mW"/>
+          <xs:enumeration value="mWh"/>
+          <xs:enumeration value="MWh"/>
+          <xs:enumeration value="Nbr of amps T.H.D. excess"/>
+          <xs:enumeration value="Nbr of demand resets"/>
+          <xs:enumeration value="Nbr of encoder tamper"/>
+          <xs:enumeration value="Nbr of excursion high"/>
+          <xs:enumeration value="Nbr of excursion low"/>
+          <xs:enumeration value="Nbr of inversion"/>
+          <xs:enumeration value="Nbr of physical tamper"/>
+          <xs:enumeration value="Nbr of power loss"/>
+          <xs:enumeration value="Nbr of power outage"/>
+          <xs:enumeration value="Nbr of pulse"/>
+          <xs:enumeration value="Nbr of removal"/>
+          <xs:enumeration value="Nbr of reprogramming"/>
+          <xs:enumeration value="Nbr of reverse rotation"/>
+          <xs:enumeration value="Nbr of sag"/>
+          <xs:enumeration value="Nbr of swells"/>
+          <xs:enumeration value="Nbr of times programmed"/>
+          <xs:enumeration value="Nbr of V T.H.D. excess"/>
+          <xs:enumeration value="Nbr of voltage unbalance"/>
+          <xs:enumeration value="Nbr of watchdog"/>
+          <xs:enumeration value="Normal voltage period"/>
+          <xs:enumeration value="percent"/>
+          <xs:enumeration value="percent relative humidity"/>
+          <xs:enumeration value="PH factor"/>
+          <xs:enumeration value="pounds per square foot"/>
+          <xs:enumeration value="Power factor"/>
+          <xs:enumeration value="PPM chlorine"/>
+          <xs:enumeration value="PPM lead"/>
+          <xs:enumeration value="PPM odorant"/>
+          <xs:enumeration value="PPM SO2"/>
+          <xs:enumeration value="Q"/>
+          <xs:enumeration value="Qh"/>
+          <xs:enumeration value="Sense input"/>
+          <xs:enumeration value="Static pascal"/>
+          <xs:enumeration value="Static pound per square inch"/>
+          <xs:enumeration value="T.H.D. Current"/>
+          <xs:enumeration value="T.H.D. Voltage"/>
+          <xs:enumeration value="Therm"/>
+          <xs:enumeration value="Therm per Hr"/>
+          <xs:enumeration value="Time"/>
+          <xs:enumeration value="turbidity"/>
+          <xs:enumeration value="US gl"/>
+          <xs:enumeration value="US gl per Hr"/>
+          <xs:enumeration value="V"/>
+          <xs:enumeration value="V RMS"/>
+          <xs:enumeration value="VA"/>
+          <xs:enumeration value="VAh"/>
+          <xs:enumeration value="VAR"/>
+          <xs:enumeration value="VARh"/>
+          <xs:enumeration value="Voltage phase angle"/>
+          <xs:enumeration value="Vsquared RMS"/>
+          <xs:enumeration value="W"/>
+          <xs:enumeration value="Wh"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="extType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="anySimpleType"/>
+          <xs:enumeration value="anyType"/>
+          <xs:enumeration value="anyURI"/>
+          <xs:enumeration value="base64Binary"/>
+          <xs:enumeration value="boolean"/>
+          <xs:enumeration value="byte"/>
+          <xs:enumeration value="date"/>
+          <xs:enumeration value="dateTime"/>
+          <xs:enumeration value="decimal"/>
+          <xs:enumeration value="double"/>
+          <xs:enumeration value="duration"/>
+          <xs:enumeration value="ENTITIES"/>
+          <xs:enumeration value="ENTITY"/>
+          <xs:enumeration value="float"/>
+          <xs:enumeration value="gDay"/>
+          <xs:enumeration value="gMonth"/>
+          <xs:enumeration value="gMonthDay"/>
+          <xs:enumeration value="gYear"/>
+          <xs:enumeration value="gYearMonth"/>
+          <xs:enumeration value="hexBinary"/>
+          <xs:enumeration value="ID"/>
+          <xs:enumeration value="IDREF"/>
+          <xs:enumeration value="IDREFS"/>
+          <xs:enumeration value="int"/>
+          <xs:enumeration value="integer"/>
+          <xs:enumeration value="language"/>
+          <xs:enumeration value="long"/>
+          <xs:enumeration value="Name"/>
+          <xs:enumeration value="NCName"/>
+          <xs:enumeration value="negativeInteger"/>
+          <xs:enumeration value="NMTOKEN"/>
+          <xs:enumeration value="NMTOKENS"/>
+          <xs:enumeration value="nonNegativeInteger"/>
+          <xs:enumeration value="nonPositiveInteger"/>
+          <xs:enumeration value="normalizedString"/>
+          <xs:enumeration value="NOTATION"/>
+          <xs:enumeration value="positiveInteger"/>
+          <xs:enumeration value="QName"/>
+          <xs:enumeration value="short"/>
+          <xs:enumeration value="string"/>
+          <xs:enumeration value="time"/>
+          <xs:enumeration value="token"/>
+          <xs:enumeration value="unsignedByte"/>
+          <xs:enumeration value="unsignedInt"/>
+          <xs:enumeration value="unsignedLong"/>
+          <xs:enumeration value="unsignedShort"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="action">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="New"/>
+          <xs:enumeration value="Change"/>
+          <xs:enumeration value="Delete"/>
+          <xs:enumeration value="Replace"/>
+          <xs:enumeration value="Link"/>
+          <xs:enumeration value="Unlink"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="phaseCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="A"/>
+          <xs:enumeration value="B"/>
+          <xs:enumeration value="C"/>
+          <xs:enumeration value="N"/>
+          <xs:enumeration value="AB"/>
+          <xs:enumeration value="AC"/>
+          <xs:enumeration value="BC"/>
+          <xs:enumeration value="ABC"/>
+          <xs:enumeration value="AN"/>
+          <xs:enumeration value="BN"/>
+          <xs:enumeration value="CN"/>
+          <xs:enumeration value="ABN"/>
+          <xs:enumeration value="ACN"/>
+          <xs:enumeration value="BCN"/>
+          <xs:enumeration value="ABCN"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="outageEventType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Instantaneous"/>
+          <xs:enumeration value="Outage"/>
+          <xs:enumeration value="Restoration"/>
+          <xs:enumeration value="NoResponse"/>
+          <xs:enumeration value="Inferred"/>
+          <xs:enumeration value="PowerOn"/>
+          <xs:enumeration value="PowerOff"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="outageDetectDeviceType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Call"/>
+          <xs:enumeration value="CustomerServiceRep"/>
+          <xs:enumeration value="InboundTelephoneDevice"/>
+          <xs:enumeration value="Meter"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="outageLocation">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="serviceLocationID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="meterID" type="tns:meterID"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="accountNumber" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="telephoneNumber" type="tns:telephoneNumber"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="telephoneNumber">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="areaCode" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="cityCode" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="countryCode" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="localNumber" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="extension" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfMessage">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="message" type="tns:message"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="message">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="recordID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="eventTime" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="listenedOn" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="listenedBy" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="transcription" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="attachments" type="tns:ArrayOfAttachment"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="outageCustomer">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="customerID" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackPhone" type="tns:telephoneNumber"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="timeToCall" type="tns:timeToCall"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackFlag" type="xs:boolean"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackContactFirstName" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackContactLastName" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackContactMName" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackStatus" type="tns:callBackStatus"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackCompletedTime" type="xs:dateTime"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callBackType" type="tns:callBackType"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callRecordID" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="outageEventID" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="callerID" type="tns:telephoneNumber"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="serviceLocationID" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="serviceID" type="tns:serviceID"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="meterID" type="tns:meterID"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="timeToCall">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="startTime" type="xs:dateTime"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="endTime" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="callBackStatus">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="On"/>
+          <xs:enumeration value="Off"/>
+          <xs:enumeration value="StillOff"/>
+          <xs:enumeration value="Undialable"/>
+          <xs:enumeration value="MaxDial"/>
+          <xs:enumeration value="NoResponse"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="callBackType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="IVR"/>
+          <xs:enumeration value="Manual"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="priorityType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Normal"/>
+          <xs:enumeration value="NeedsAttention"/>
+          <xs:enumeration value="Urgent"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="resolvedLevel">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Meter"/>
+          <xs:enumeration value="Address"/>
+          <xs:enumeration value="Unresolved"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="ArrayOfAttachment">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="attachment" type="tns:attachment"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="attachment">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:choice maxOccurs="1" minOccurs="1">
+                <xs:element maxOccurs="1" minOccurs="0" name="contentReference" type="tns:contentReference"/>
+                <xs:element maxOccurs="1" minOccurs="0" name="content" type="tns:content"/>
+              </xs:choice>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="contentReference">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="URI" type="xs:anyURI"/>
+            <xs:attribute name="name" type="xs:string"/>
+            <xs:attribute name="category" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:complexType name="content">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="contentBinary" type="xs:base64Binary"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="contentEncoding" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="contentType" type="tns:contentType"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="fileName" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="sourceFilePath" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="attachDateTime" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="caption" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="contentType">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="type" type="tns:binaryType"/>
+            <xs:attribute name="subType" type="xs:string"/>
+            <xs:attribute name="charset" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:simpleType name="binaryType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="text"/>
+          <xs:enumeration value="image"/>
+          <xs:enumeration value="audio"/>
+          <xs:enumeration value="video"/>
+          <xs:enumeration value="application"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="serviceID">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="serviceType" type="tns:serviceType"/>
+            <xs:attribute name="objectID" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:element name="GetOutageEventStatusByOutageLocation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="location" type="tns:outageLocation"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetOutageEventStatusByOutageLocationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="GetOutageEventStatusByOutageLocationResult" type="tns:outageEventStatus"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="outageEventStatus">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageStatus" type="tns:outageStatus"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="crewDispatched" type="xs:boolean"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="crewOnSite" type="xs:boolean"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="ETOR" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="customerFound" type="xs:boolean"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageAttachments" type="tns:ArrayOfOutageAttachment"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:simpleType name="outageStatus">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Assumed"/>
+          <xs:enumeration value="Confirmed"/>
+          <xs:enumeration value="Restored"/>
+          <xs:enumeration value="Scheduled"/>
+          <xs:enumeration value="StillOut"/>
+          <xs:enumeration value="NonPay"/>
+          <xs:enumeration value="Other"/>
+          <xs:enumeration value="Unknown"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="ArrayOfOutageAttachment">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="outageAttachment" type="tns:outageAttachment"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="outageAttachment">
+        <xs:sequence>
+          <xs:choice maxOccurs="1" minOccurs="1">
+            <xs:element maxOccurs="1" minOccurs="0" name="attachmentID" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="transcription" type="xs:string"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="InitiateMeterReadingsByMeterID">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="meterIDs" type="tns:ArrayOfMeterID1"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="responseURL" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="transactionID" type="xs:string"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="expTime" type="tns:expirationTime"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="InitiateMeterReadingsByMeterIDResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="InitiateMeterReadingsByMeterIDResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ReadingChangedNotification">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="changedMeterReads" type="tns:ArrayOfMeterReading1"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="transactionID" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ReadingChangedNotificationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="ReadingChangedNotificationResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfMeterReading1">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="meterReading" nillable="true" type="tns:meterReading"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="meterReading">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="meterID" type="tns:meterID"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="deviceID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="readingValues" type="tns:ArrayOfReadingValue"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfReadingValue">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="readingValue" type="tns:readingValue"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="readingValue">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="extensions" type="tns:extensions"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="extensionsList" type="tns:ArrayOfExtensionsItem"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="units" type="tns:uom"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="value" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="ratePeriod" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="readingType" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="fieldName" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="name" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="measurementPeriod" type="tns:measurementPeriod"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="timeStamp" type="xs:dateTime"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="readingStatusCode" type="tns:readingStatusCode"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="readingTypeCode" type="tns:readingTypeCode"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="measurementPeriod">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Current"/>
+          <xs:enumeration value="Previous"/>
+          <xs:enumeration value="Previous Season"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:complexType name="readingStatusCode">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="originatingSystemID" type="xs:string"/>
+            <xs:attribute name="codeCategory" type="xs:string"/>
+            <xs:attribute name="codeIndex" type="xs:string"/>
+            <xs:anyAttribute/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:complexType name="readingTypeCode">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="name" type="xs:string"/>
+            <xs:attribute name="timeAttribute" type="xs:string"/>
+            <xs:attribute name="dataQualifier" type="xs:string"/>
+            <xs:attribute name="accumulationBehavior" type="xs:string"/>
+            <xs:attribute name="flowDirection" type="xs:string"/>
+            <xs:attribute name="UOMCategory" type="xs:string"/>
+            <xs:attribute name="measurementCategory" type="xs:string"/>
+            <xs:attribute name="phaseIndex" type="xs:string"/>
+            <xs:attribute name="unitsMultiplier" type="xs:string"/>
+            <xs:attribute name="displayableUOM" type="xs:string"/>
+            <xs:anyAttribute/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:element name="MeterEventNotification">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="events" type="tns:meterEventList"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="transactionID" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="MeterEventNotificationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="MeterEventNotificationResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="meterEventList">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="eventInstances" type="tns:ArrayOfEventInstance"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfEventInstance">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="eventInstance" type="tns:eventInstance"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="eventInstance">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="extensions" type="tns:extensions"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="meterID" type="tns:meterID"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="meterEvent" type="tns:meterEvent"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="timeStamp" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="meterEvent">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="domain" type="xs:string"/>
+            <xs:attribute name="domainPart" type="xs:string"/>
+            <xs:attribute name="type" type="xs:string"/>
+            <xs:attribute name="index" type="xs:string"/>
+            <xs:attribute name="value" type="xs:string"/>
+            <xs:attribute name="codeString" type="xs:string"/>
+            <xs:anyAttribute/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+
+      <xs:element name="CallBackListNotification">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="newCallBackLists" type="tns:ArrayOfCallBackList"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CallBackListNotificationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="CallBackListNotificationResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfCallBackList">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="callBackList" nillable="true" type="tns:callBackList"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="callBackList">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageEventID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageStatus" type="tns:outageStatus"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageDescription" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageCustomerList" type="tns:ArrayOfOutageCustomer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="message" type="tns:message"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="callBackListType" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfOutageCustomer">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="outageCustomer" type="tns:outageCustomer"/>
+        </xs:sequence>
+      </xs:complexType>
+
+      <xs:element name="GetOutageEvent">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="outageEventID" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetOutageEventResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="GetOutageEventResult" type="tns:outageEvent"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="outageEvent">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspPointObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="area" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="problemLocation" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="deviceID" type="tns:objectRef"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="deviceType" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outagedPhase" type="tns:phaseCode"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="substationCode" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="feeder" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="actualFault" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="faultType" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="isCustomerResponsible" type="xs:boolean"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="isPlanned" type="xs:boolean"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageDescription" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageStatus" type="tns:outageStatus"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="priority" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="startTime" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageDefined" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="firstDispatch" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="firstETA" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="firstArrival" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="ETOR" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="completed" type="xs:dateTime"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="message" type="tns:message"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="crewsDispatched" type="tns:ArrayOfString2"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="customersAffected" type="xs:integer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="priorityCustomersCount" type="xs:integer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="ODEventCount" type="xs:integer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="customersRestored" type="xs:integer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageReasonCodeList" type="tns:outageReasonCodeList"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageEventStatus" type="tns:outageEventStatus"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageCustomerList" type="tns:ArrayOfOutageCustomer"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="crewActionEvents" type="tns:ArrayOfCrewActionEvent"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType abstract="true" name="mspPointObject">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="GMLLocation" type="gml:PointType"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="gpsPoint" type="tns:gpsPoint"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="GPSLocation" type="tns:GPSLocation"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="gridLocation" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="rotation" type="xs:float"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="facilityID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="timeZone" type="tns:timeZone"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="gpsPoint">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="1" name="latitude" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="1" name="longitude" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="altitude" type="xs:double"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GPSLocation">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="1" name="latitude" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="1" name="longitude" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="altitude" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="GPSMetadata" type="tns:GPSMetadata"/>
+        </xs:sequence>
+        <xs:attribute name="GPSValidity" type="xs:boolean"/>
+      </xs:complexType>
+      <xs:complexType name="GPSMetadata">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="easting" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="northing" type="xs:double"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="source" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="number" type="xs:long"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="isRealTimeDiffCorrection" type="xs:boolean"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="hdop" type="xs:float"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="vdop" type="xs:float"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="diffID" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="collected" type="xs:dateTime"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="numSat" type="xs:long"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="timeZone">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="DSTEnabled" type="xs:boolean"/>
+            <xs:attribute name="UTCOffset" type="xs:decimal" use="required"/>
+            <xs:attribute name="name" type="xs:string"/>
+            <xs:attribute name="comment" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:complexType name="objectRef">
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="noun" type="xs:QName"/>
+        <xs:attribute name="objectID" type="xs:string"/>
+        <xs:attribute name="utility" type="xs:string"/>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfString2">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="crewID" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="outageReasonCodeList">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageCause" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="equipmentFailure" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="voltageLevel" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="weatherCondition" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="systemCharacterization" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="responsibleSystem" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageCondition" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="interruptingDevice" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="interruptingDeviceInitiation" type="tns:outageReason"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="customerResoration" type="tns:outageReason"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="outageReason">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="outageReportingCodeList" type="tns:ArrayOfOutageReportingCode"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfOutageReportingCode">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="outageReportingCode" type="tns:outageReportingCode"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="outageReportingCode">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute name="reportingBody" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfCrewActionEvent">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="crewActionEvent" type="tns:crewActionEvent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="crewActionEvent">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageEventID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="requestedCrewID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="assignedCrewID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="crewAction" type="tns:crewAction"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:simpleType name="crewAction">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Request"/>
+          <xs:enumeration value="Accepted"/>
+          <xs:enumeration value="Declined"/>
+          <xs:enumeration value="Released"/>
+        </xs:restriction>
+      </xs:simpleType>
+
+      <xs:element name="OutageEventChangedNotification">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="oEvents" type="tns:ArrayOfOutageEvent"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfOutageEvent">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="outageEvent" nillable="true" type="tns:outageEvent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="OutageEventChangedNotificationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="OutageEventChangedNotificationResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="CustomersAffectedByOutageNotification">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="newOutages" type="tns:ArrayOfCustomersAffectedByOutage"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="ArrayOfCustomersAffectedByOutage">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="customersAffectedByOutage" nillable="true" type="tns:customersAffectedByOutage"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="CustomersAffectedByOutageNotificationResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="0" name="CustomersAffectedByOutageNotificationResult" type="tns:ArrayOfErrorObject"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:complexType name="customersAffectedByOutage">
+        <xs:complexContent mixed="false">
+          <xs:extension base="tns:mspObject">
+            <xs:sequence>
+              <xs:element maxOccurs="1" minOccurs="0" name="outageEventID" type="xs:string"/>
+              <xs:element maxOccurs="1" minOccurs="0" name="affectedMeters" type="tns:ArrayOfAffectedMeter"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfAffectedMeter">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="affectedMeter" type="tns:affectedMeter"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="affectedMeter">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="meterID" type="tns:meterID"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="serviceLocationID" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+
+    </xs:schema>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="cpsm_V4.1_Release">
+
+      <xs:complexType abstract="true" name="IdentifiedObject">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="mRID" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="Names" type="cpsm:ArrayOfName"/>
+        </xs:sequence>
+        <xs:anyAttribute/>
+      </xs:complexType>
+      <xs:complexType name="ArrayOfName">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="Name" type="cpsm:Name"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="Name">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="nameString" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="NameType" type="cpsm:NameType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="NameType">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="nameString" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="NameTypeAuthority" type="cpsm:NameTypeAuthority"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="NameTypeAuthority">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="0" name="nameString" type="xs:string"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="description" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+    <xs:schema elementFormDefault="qualified" targetNamespace="gml_V4.1_Release">
+      <xs:import namespace="http://www.w3.org/1999/xlink"/>
+      <xs:complexType name="PointType">
+        <xs:complexContent mixed="false">
+          <xs:extension base="gml:AbstractGeometryType">
+            <xs:sequence>
+              <xs:choice maxOccurs="1" minOccurs="1">
+                <xs:element maxOccurs="1" minOccurs="0" name="coord" type="gml:CoordType"/>
+                <xs:element maxOccurs="1" minOccurs="0" name="coordinates" type="gml:CoordinatesType"/>
+              </xs:choice>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType abstract="true" name="AbstractGeometryType"/>
+      <xs:complexType name="CoordType">
+        <xs:sequence>
+          <xs:element maxOccurs="1" minOccurs="1" name="X" type="xs:decimal"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="Y" type="xs:decimal"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="Z" type="xs:decimal"/>
+          <xs:element maxOccurs="1" minOccurs="0" name="Bulge" type="xs:float"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="CoordinatesType">
+        <xs:simpleContent>
+          <xs:extension base="xs:string">
+            <xs:attribute default="." name="decimal" type="xs:string"/>
+            <xs:attribute default="," name="cs" type="xs:string"/>
+            <xs:attribute default=" " name="ts" type="xs:string"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="GetOutageEventStatusByOutageLocationSoapIn">
+    <wsdl:part name="parameters" element="tns:GetOutageEventStatusByOutageLocation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetOutageEventStatusByOutageLocationSoapOut">
+    <wsdl:part name="parameters" element="tns:GetOutageEventStatusByOutageLocationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InitiateMeterReadingsByMeterIDSoapIn">
+    <wsdl:part name="parameters" element="tns:InitiateMeterReadingsByMeterID">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetOutageEventSoapOut">
+    <wsdl:part name="parameters" element="tns:GetOutageEventResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ODEventNotificationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CallBackListNotificationSoapIn">
+    <wsdl:part name="parameters" element="tns:CallBackListNotification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ODEventNotificationSoapIn">
+    <wsdl:part name="parameters" element="tns:ODEventNotification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InitiateOutageDetectionEventRequestSoapIn">
+    <wsdl:part name="parameters" element="tns:InitiateOutageDetectionEventRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PingURLSoapOut">
+    <wsdl:part name="parameters" element="tns:PingURLResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMethodsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetMethodsResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InitiateOutageDetectionEventRequestMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InitiateMeterReadingsByMeterIDSoapOut">
+    <wsdl:part name="parameters" element="tns:InitiateMeterReadingsByMeterIDResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetOutageEventMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetOutageEventStatusByOutageLocationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OutageEventChangedNotificationSoapOut">
+    <wsdl:part name="parameters" element="tns:OutageEventChangedNotificationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMethodsMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OutageEventChangedNotificationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMethodsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetMethods">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReadingChangedNotificationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OutageEventChangedNotificationSoapIn">
+    <wsdl:part name="parameters" element="tns:OutageEventChangedNotification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CustomersAffectedByOutageNotificationSoapOut">
+    <wsdl:part name="parameters" element="tns:CustomersAffectedByOutageNotificationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InitiateOutageDetectionEventRequestSoapOut">
+    <wsdl:part name="parameters" element="tns:InitiateOutageDetectionEventRequestResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InitiateMeterReadingsByMeterIDMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReadingChangedNotificationSoapOut">
+    <wsdl:part name="parameters" element="tns:ReadingChangedNotificationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ODEventNotificationSoapOut">
+    <wsdl:part name="parameters" element="tns:ODEventNotificationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetOutageEventSoapIn">
+    <wsdl:part name="parameters" element="tns:GetOutageEvent">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MeterEventNotificationSoapIn">
+    <wsdl:part name="parameters" element="tns:MeterEventNotification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ReadingChangedNotificationSoapIn">
+    <wsdl:part name="parameters" element="tns:ReadingChangedNotification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CallBackListNotificationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CustomersAffectedByOutageNotificationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PingURLMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MeterEventNotificationMultiSpeakMsgHeader">
+    <wsdl:part name="MultiSpeakMsgHeader" element="tns:MultiSpeakMsgHeader">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CustomersAffectedByOutageNotificationSoapIn">
+    <wsdl:part name="parameters" element="tns:CustomersAffectedByOutageNotification">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CallBackListNotificationSoapOut">
+    <wsdl:part name="parameters" element="tns:CallBackListNotificationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MeterEventNotificationSoapOut">
+    <wsdl:part name="parameters" element="tns:MeterEventNotificationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PingURLSoapIn">
+    <wsdl:part name="parameters" element="tns:PingURL">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="OMS_MultiSpeak_v41_Soap">
+    <wsdl:operation name="PingURL">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Requester pings URL of server to see if it is alive.  Returns errorObject(s) as necessary to communicate application status.</wsdl:documentation>
+      <wsdl:input message="tns:PingURLSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:PingURLSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMethods">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Requester requests list of request-type methods supported by server.</wsdl:documentation>
+      <wsdl:input message="tns:GetMethodsSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetMethodsSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InitiateOutageDetectionEventRequest">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Client requests server to update the status of an outageDetectionDevice.  OD responds by publishing a revised outageDetectionEvent (using the ODEventNotification method on OA-OD) to the URL specified in the responseURL parameter.  OD returns information about failed transactions using an array of errorObjects. The transactionID calling parameter is included to link a returned ODEventNotification with this request. The expiration time parameter indicates the amount of time for which the publisher should try to obtain and publish the data; if the publisher has been unsuccessful in publishing the data after the expiration time, then the publisher will discard the request and the requestor should not expect a response.</wsdl:documentation>
+      <wsdl:input message="tns:InitiateOutageDetectionEventRequestSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:InitiateOutageDetectionEventRequestSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ODEventNotification">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Publisher notifies subscriber of a change in OutageDetectionEvents by sending an array of changed OutageDetectionEvent objects.  Subscriber returns information about failed transactions using an array of errorObjects. The message header attribute 'registrationID' should be added to all publish messages to indicate to the subscriber under which registrationID they received this notification data.</wsdl:documentation>
+      <wsdl:input message="tns:ODEventNotificationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:ODEventNotificationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOutageEventStatusByOutageLocation">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the current status of an outage event, given the outage location.  The outageLocation object includes the telephone number, service locationID, account number and/or meter identifier at the location of the outage.</wsdl:documentation>
+      <wsdl:input message="tns:GetOutageEventStatusByOutageLocationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetOutageEventStatusByOutageLocationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InitiateMeterReadingsByMeterID">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">CB requests a new meter reading from MR, on meters selected by meterID.  MR returns information about failed transactions using an array of errorObjects. The meter reading is returned to the CB in the form of a meterReading, anintervalData block, or a formattedBlock, sent to the URL specified in the responseURL.  The transactionID calling parameter links this Initiate request with the published data method call.The expiration time parameter indicates the amount of time for which the publisher should try to obtain and publish the data; if the publisher has been unsuccessful in publishing the data after the expiration time, then the publisher will discard the request and the requestor should not expect a response.</wsdl:documentation>
+      <wsdl:input message="tns:InitiateMeterReadingsByMeterIDSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:InitiateMeterReadingsByMeterIDSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReadingChangedNotification">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Publisher notifies Subscriber of a change in meter readings by sending the changed meterReading objects.  Subscriber returns information about failed transactions in an array of errorObjects.The transactionID calling parameter links this Initiate request with the published data method call. The message header attribute 'registrationID' should be added to all publish messages to indicate to the subscriber under which registrationID they received this notification data.</wsdl:documentation>
+      <wsdl:input message="tns:ReadingChangedNotificationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:ReadingChangedNotificationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MeterEventNotification">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Publisher notifies subscriber of meter event(s) by sending a meterEventList object.  Subscriber returns information about failed transactions in an array of errorObjects.  The message header attribute 'registrationID' should be added to all publish messages to indicate to the subscriber under which registrationID they received this notification data.</wsdl:documentation>
+      <wsdl:input message="tns:MeterEventNotificationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:MeterEventNotificationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CallBackListNotification">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Publisher Notifies CH of new call back list(s) by sending the new call back lists.  CH returns status of failed transactions in an array of errorObjects. The message header attribute 'registrationID' should be added to all publish messages to indicate to the subscriber under which registrationID they received this notification data.</wsdl:documentation>
+      <wsdl:input message="tns:CallBackListNotificationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:CallBackListNotificationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOutageEvent">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the outageEvent for the given outageEventID.  This can be either an active or a historical outage event.  The outageEventID is the objectID for the outageEvent object.</wsdl:documentation>
+      <wsdl:input message="tns:GetOutageEventSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:GetOutageEventSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OutageEventChangedNotification">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Publisher notifies subscriber of a change in OutageEvent by sending an array of changed OutageEvent objects.  GV returns information about failed transactions using an array of errorObjects. The message header attribute 'registrationID' should be added to all publish messages to indicate to the subscriber under which registrationID they received this notification data.</wsdl:documentation>
+      <wsdl:input message="tns:OutageEventChangedNotificationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:OutageEventChangedNotificationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomersAffectedByOutageNotification">
+<wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Publisher Notifies CH of new outages by sending the new lists of CustomersAffectedByOutage.  CH returns status of failed transactions in an array of errorObjects. The message header attribute 'registrationID' should be added to all publish messages to indicate to the subscriber under which registrationID they received this notification data.</wsdl:documentation>
+      <wsdl:input message="tns:CustomersAffectedByOutageNotificationSoapIn">
+    </wsdl:input>
+      <wsdl:output message="tns:CustomersAffectedByOutageNotificationSoapOut">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="OMS_MultiSpeak_v41_Soap12" type="tns:OMS_MultiSpeak_v41_Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="PingURL">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/PingURL" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:PingURLMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:PingURLMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMethods">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/GetMethods" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetMethodsMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetMethodsMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InitiateOutageDetectionEventRequest">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/InitiateOutageDetectionEventRequest" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:InitiateOutageDetectionEventRequestMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:InitiateOutageDetectionEventRequestMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ODEventNotification">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/ODEventNotification" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:ODEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:ODEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOutageEventStatusByOutageLocation">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/GetOutageEventStatusByOutageLocation" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetOutageEventStatusByOutageLocationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetOutageEventStatusByOutageLocationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InitiateMeterReadingsByMeterID">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/InitiateMeterReadingsByMeterID" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:InitiateMeterReadingsByMeterIDMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:InitiateMeterReadingsByMeterIDMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReadingChangedNotification">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/ReadingChangedNotification" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:ReadingChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:ReadingChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MeterEventNotification">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/MeterEventNotification" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:MeterEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:MeterEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CallBackListNotification">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/CallBackListNotification" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:CallBackListNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:CallBackListNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOutageEvent">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/GetOutageEvent" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetOutageEventMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetOutageEventMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OutageEventChangedNotification">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/OutageEventChangedNotification" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:OutageEventChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:OutageEventChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomersAffectedByOutageNotification">
+      <soap12:operation soapAction="http://www.multispeak.org/Version_4.1_Release/CustomersAffectedByOutageNotification" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:CustomersAffectedByOutageNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:CustomersAffectedByOutageNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap12:header>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="OMS_MultiSpeak_v41_Soap11" type="tns:OMS_MultiSpeak_v41_Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="PingURL">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/PingURL" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:PingURLMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:PingURLMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetMethods">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/GetMethods" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetMethodsMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetMethodsMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InitiateOutageDetectionEventRequest">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/InitiateOutageDetectionEventRequest" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:InitiateOutageDetectionEventRequestMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:InitiateOutageDetectionEventRequestMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ODEventNotification">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/ODEventNotification" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:ODEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:ODEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOutageEventStatusByOutageLocation">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/GetOutageEventStatusByOutageLocation" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetOutageEventStatusByOutageLocationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetOutageEventStatusByOutageLocationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InitiateMeterReadingsByMeterID">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/InitiateMeterReadingsByMeterID" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:InitiateMeterReadingsByMeterIDMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:InitiateMeterReadingsByMeterIDMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReadingChangedNotification">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/ReadingChangedNotification" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:ReadingChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:ReadingChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MeterEventNotification">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/MeterEventNotification" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:MeterEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:MeterEventNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CallBackListNotification">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/CallBackListNotification" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:CallBackListNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:CallBackListNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetOutageEvent">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/GetOutageEvent" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetOutageEventMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetOutageEventMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OutageEventChangedNotification">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/OutageEventChangedNotification" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:OutageEventChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:OutageEventChangedNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CustomersAffectedByOutageNotification">
+      <soap:operation soapAction="http://www.multispeak.org/Version_4.1_Release/CustomersAffectedByOutageNotification" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:CustomersAffectedByOutageNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+        <soap:header message="tns:CustomersAffectedByOutageNotificationMultiSpeakMsgHeader" part="MultiSpeakMsgHeader" use="literal">
+        </soap:header>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="OMS_MultiSpeak_v41">
+    <wsdl:port name="OMS_MultiSpeak_v41_Soap11_Endpoint" binding="tns:OMS_MultiSpeak_v41_Soap11">
+      <soap:address location="http://localhost:8080/axis2/services/OMS_MultiSpeak_v41.OMS_MultiSpeak_v41_Soap11_Endpoint/"/>
+    </wsdl:port>
+    <wsdl:port name="OMS_MultiSpeak_v41_Soap12_Endpoint" binding="tns:OMS_MultiSpeak_v41_Soap12">
+      <soap12:address location="http://localhost:8080/axis2/services/OMS_MultiSpeak_v41.OMS_MultiSpeak_v41_Soap12_Endpoint/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

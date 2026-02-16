@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiSpeak Meter Simulation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --text-muted: #8b9cb4;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --warning: #eab308;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .layout {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 1.75rem;
+      margin: 0 0 0.25rem 0;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 1rem 0;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.2rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .num { text-align: right; }
+    .col-hidden { display: none; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-online { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .badge-outage { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    button, .btn {
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-bottom: 0px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+    }
+    .btn-ghost:hover { background: var(--border); }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.35); }
+    .btn-sm { padding: 0.35rem 0.6rem; font-size: 0.8rem; }
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal.open { display: flex; }
+    .modal-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 420px;
+    }
+    .modal-inner h3 { margin: 0 0 1rem 0; font-size: 1.1rem; }
+    .modal-actions { margin-top: 1.25rem; display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .endpoint-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: var(--surface2);
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      word-break: break-all;
+    }
+    .toolbar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .filter-input {
+      flex: 1;
+      min-width: 200px;
+      max-width: 400px;
+    }
+    .meter-summary {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0 0 0.75rem 0;
+    }
+    .load-more-wrap {
+      margin-top: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="card">
+      <h2>Meters</h2>
+      <div class="toolbar">
+        <input type="text" id="meterFilter" placeholder="Filter by Id, Meter #, Object ID, Service…" class="filter-input" />
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnAdd">Add meter</button>
+          <button type="button" class="btn btn-ghost" id="btnSave">Save database</button>
+          <label class="btn btn-ghost" for="premisesFileInput">Upload premises</label>
+          <input type="file" id="premisesFileInput" accept=".xml,application/xml,text/xml" style="display: none;" />
+        </div>
+      </div>
+      <p class="meter-summary" id="meterSummary"></p>
+      <table>
+        <thead>
+            <tr>
+                <th>Meter #</th>
+                <th class="col-hidden">Service</th>
+                <th>Power</th>
+                <th>Comms</th>
+                <th class="num">Voltage (V)</th>
+                <th class="num">Current (A)</th>
+                <th class="num col-hidden">Active Power (kW)</th>
+                <th class="num col-hidden">Reactive Power (kvar)</th>
+                <th>Last read</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="meterList"></tbody>
+      </table>
+      <div class="load-more-wrap">
+        <button type="button" class="btn btn-ghost" id="btnLoadMore" style="display: none;">Load more</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-inner">
+      <h3 id="modalTitle">Add meter</h3>
+      <form id="meterForm">
+          <input type="hidden" id="meterNo" />
+          <div class="form-row">
+              <div>
+                  <label for="objectId">Object ID</label>
+                  <input type="text" id="objectId" />
+              </div>
+          </div>
+          <div class="form-row">
+              <div>
+                  <label for="serviceType">Service type</label>
+                  <select id="serviceType">
+                      <option value="Electric">Electric</option>
+                      <option value="Gas">Gas</option>
+                      <option value="Water">Water</option>
+                      <option value="Other">Other</option>
+                  </select>
+              </div>
+              <div>
+                  <label for="utility">Utility</label>
+                  <input type="text" id="utility" />
+              </div>
+          </div>
+          <div class="form-row">
+              <div>
+                  <label for="voltageReading">Voltage (V)</label>
+                  <input type="number" id="voltageReading" step="0.01" value="0" placeholder="Optional"/>
+              </div>
+              <div>
+                  <label for="currentReading">Current (A)</label>
+                  <input type="number" id="currentReading" step="0.01" value="0" placeholder="Optional"/>
+              </div>
+          </div>
+          <div class="form-row">
+              <div>
+                  <label for="activePowerReading">Power (kW)</label>
+                  <input type="number" id="activePowerReading" step="0.01" placeholder="Optional" />
+              </div>
+              <div>
+                  <label for="activePowerReading">Power (kvar)</label>
+                  <input type="number" id="reactivePowerReading" step="0.01" placeholder="Optional" />
+              </div>
+          </div>
+          <div class="form-row">
+              <div>
+                  <label for="isOnline">Power Status</label>
+                  <select id="isOnline">
+                      <option value="true">Online</option>
+                      <option value="false">Outage</option>
+                  </select>
+              </div>
+              <div>
+                  <label for="commsStatus">Comms Status</label>
+                  <select id="commsStatus">
+                      <option value="true">Online</option>
+                      <option value="false">Offline</option>
+                  </select>
+              </div>
+          </div>
+          <div class="modal-actions">
+              <button type="button" class="btn btn-ghost" id="btnCancel">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+    const API = '';
+    const PAGE_SIZE = 100;
+    
+    let loadedMeters = [];
+    let totalMeters = 0;
+    let currentFilter = '';
+
+    function renderMeterRow(m) {
+      return `
+        <tr>
+          <td class="mono">${escape(m.meterNo)}</td>
+
+          <td class="col-hidden">${escape(m.serviceType)}</td>
+
+          <td><span class="badge ${m.isOnline ? 'badge-online' : 'badge-outage'}">${m.isOnline ? 'Online' : 'Outage'}</span></td>
+          <td><span class="badge ${m.commsStatus ? 'badge-online' : 'badge-outage'}">${m.commsStatus ? 'Online' : 'Offline'}</span></td>
+          <td class="num">${m.voltageReading != null ? Number(m.voltageReading).toFixed(2) : '–'}</td>
+          <td class="num">${m.currentReading != null ? Number(m.currentReading).toFixed(2) : '–'}</td>
+          <td class="num col-hidden">${m.activePowerReading != null ? Number(m.activePowerReading).toFixed(2) : '–'}</td>
+          <td class="num col-hidden">${m.reactivePowerReading != null ? Number(m.reactivePowerReading).toFixed(2) : '–'}</td>
+          
+          <td>${m.lastReadingTime ? new Date(m.lastReadingTime).toLocaleString() : '–'}</td>
+          <td>
+            <div class="actions">
+            <button type="button" class="btn btn-ghost" data-edit="${escape(m.meterNo)}">Edit</button>
+            <button type="button" class="btn btn-danger" data-delete="${escape(m.meterNo)}">Delete</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-od-event="${escape(m.meterNo)}" title="Send Outage Detection Event Notification">OD Event</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-meter-event="${escape(m.meterNo)}" title="Send Meter Event Notification">Meter Event</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-reading-changed="${escape(m.meterNo)}" title="Send Reading Changed Notification">Reading</button>  
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function bindRowActions(tbody) {
+        tbody.querySelectorAll('[data-edit]').forEach(btn => {
+            btn.addEventListener('click', () => openEdit(btn.dataset.edit));
+        });
+        tbody.querySelectorAll('[data-delete]').forEach(btn => {
+            btn.addEventListener('click', () => deleteMeter(btn.dataset.delete));
+        });
+        tbody.querySelectorAll('[data-od-event]').forEach(btn => {
+            btn.addEventListener('click', () => sendODEvent(btn.dataset.odEvent));
+        });
+        tbody.querySelectorAll('[data-reading-changed]').forEach(btn => {
+            btn.addEventListener('click', () => sendReadingChanged(btn.dataset.readingChanged));
+        });
+        tbody.querySelectorAll('[data-meter-event]').forEach(btn => {
+            btn.addEventListener('click', () => sendMeterEvent(btn.dataset.meterEvent));
+        });
+    }
+
+    async function sendODEvent(meterId) {
+      const res = await fetch(API + `/api/meters/${meterId}/od-event`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meterId })
+      });
+      const data = await res.json();
+      alert(data.success ? 'ODEventNotification sent for this meter.' : ('Error: ' + (data.error || JSON.stringify(data))));
+    }
+
+    async function sendReadingChanged(meterId) {
+        const res = await fetch(API + `/api/meters/${meterId}/reading-changed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ meterId })
+      });
+      const data = await res.json();
+      alert(data.success ? 'ReadingChangedNotification sent for this meter.' : ('Error: ' + (data.error || JSON.stringify(data))));
+    }
+
+    async function sendMeterEvent(meterId) {
+        const res = await fetch(API + `/api/meters/${meterId}/meter-event`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ meterId })
+        });
+        const data = await res.json();
+        alert(data.success ? 'MeterEventNotification sent for this meter.' : ('Error: ' + (data.error || JSON.stringify(data))));
+    }
+
+    async function fetchMetersPage(filter, skip, take) {
+      const params = new URLSearchParams();
+      if (filter) params.set('filter', filter);
+      params.set('skip', String(skip));
+      params.set('take', String(take));
+      const res = await fetch(API + '/api/meters?' + params.toString());
+      return res.json();
+    }
+
+    function updateSummary() {
+      const start = loadedMeters.length === 0 ? 0 : 1;
+      const end = loadedMeters.length;
+      const text = totalMeters === 0
+        ? 'No meters.'
+        : `Showing ${start}–${end} of ${totalMeters.toLocaleString()} meters.`;
+      document.getElementById('meterSummary').textContent = text;
+      const loadMoreBtn = document.getElementById('btnLoadMore');
+      loadMoreBtn.style.display = (loadedMeters.length < totalMeters && totalMeters > 0) ? 'inline-block' : 'none';
+    }
+
+    async function loadMeters(append = false) {
+      const filter = document.getElementById('meterFilter').value.trim();
+      if (!append) {
+        loadedMeters = [];
+        totalMeters = 0;
+        currentFilter = filter;
+      }
+      const skip = append ? loadedMeters.length : 0;
+      const data = await fetchMetersPage(filter, skip, PAGE_SIZE);
+      const items = data.items ?? data;
+      const total = data.total ?? items.length;
+      if (!append) {
+        totalMeters = total;
+        loadedMeters = Array.isArray(items) ? items : [];
+      } else {
+        loadedMeters = loadedMeters.concat(Array.isArray(items) ? items : []);
+      }
+      const tbody = document.getElementById('meterList');
+      if (!append) tbody.innerHTML = '';
+      (Array.isArray(items) ? items : []).forEach(m => {
+        tbody.insertAdjacentHTML('beforeend', renderMeterRow(m));
+      });
+      bindRowActions(tbody);
+      updateSummary();
+    }
+
+    async function loadMore() {
+      await loadMeters(true);
+    }
+
+    function escape(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function openAdd() {
+      document.getElementById('modalTitle').textContent = 'Add meter';
+      document.getElementById('meterForm').reset();
+      document.getElementById('meterId').value = '';
+      document.getElementById('meterNo').required = true;
+      document.getElementById('modal').classList.add('open');
+    }
+
+    async function openEdit(id) {
+      const res = await fetch(API + '/api/meters/' + encodeURIComponent(id));
+      if (!res.ok) return;
+      const m = await res.json();
+      document.getElementById('modalTitle').textContent = 'Edit meter';
+      document.getElementById('meterNo').value = m.meterNo;
+      document.getElementById('objectId').value = m.objectId || '';
+      document.getElementById('serviceType').value = m.serviceType || 'Electric';
+      document.getElementById('utility').value = m.utility || '';
+        document.getElementById('voltageReading').value = m.voltageReading ?? '';
+        document.getElementById('currentReading').value = m.currentReading ?? '';
+        document.getElementById('activePowerReading').value = m.activePowerReading ?? '';
+        document.getElementById('reactivePowerReading').value = m.reactivePowerReading ?? '';
+        document.getElementById('isOnline').value = m.isOnline !== false ? 'true' : 'false';
+        document.getElementById('commsStatus').value = m.commsStatus !== false ? 'true' : 'false';
+      document.getElementById('modal').classList.add('open');
+    }
+
+    document.getElementById('meterForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('meterNo').value;
+        const payload = {
+            meterNo: document.getElementById('meterNo').value.trim(),
+            objectId: document.getElementById('objectId').value.trim() || null,
+            serviceType: document.getElementById('serviceType').value,
+            utility: document.getElementById('utility').value.trim() || null,
+            voltageReading: document.getElementById('voltageReading').value.trim() ? parseFloat(document.getElementById('voltageReading').value) : null,
+            currentReading: document.getElementById('currentReading').value.trim() ? parseFloat(document.getElementById('currentReading').value) : null,
+            activePowerReading: document.getElementById('activePowerReading').value.trim() ? parseFloat(document.getElementById('activePowerReading').value) : null,
+            reactivePowerReading: document.getElementById('reactivePowerReading').value.trim() ? parseFloat(document.getElementById('reactivePowerReading').value) : null,
+            isOnline: document.getElementById('isOnline').value === 'true',
+            commsStatus: document.getElementById('commsStatus').value === 'true',
+            lastReadingTime: new Date().toISOString()
+        };
+        const url = API + '/api/meters/';
+        const method = 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) {
+            const err = await res.text();
+            alert(err || 'Save failed');
+            return;
+        }
+        document.getElementById('modal').classList.remove('open');
+        loadMeters();
+    });
+
+    async function deleteMeter(id) {
+        if (!confirm('Delete this meter?')) return;
+        const res = await fetch(API + '/api/meters/' + encodeURIComponent(id), { method: 'DELETE' });
+        if (res.ok) loadMeters();
+    }
+
+    document.getElementById('btnAdd').addEventListener('click', openAdd);
+    document.getElementById('btnCancel').addEventListener('click', () => document.getElementById('modal').classList.remove('open'));
+
+    let filterTimeout;
+    document.getElementById('meterFilter').addEventListener('input', () => {
+        clearTimeout(filterTimeout);
+        filterTimeout = setTimeout(() => loadMeters(false), 300);
+    });
+    document.getElementById('btnLoadMore').addEventListener('click', loadMore);
+
+    document.getElementById('btnSave').addEventListener('click', async () => {
+      const btn = document.getElementById('btnSave');
+      btn.disabled = true;
+      try {
+        const res = await fetch(API + '/api/meters/persist', { method: 'POST' });
+        const data = await res.json();
+        alert(data.success ? 'Saved ' + (data.count ?? 0) + ' meters to disk.' : ('Error: ' + (data.error || '')));
+      } catch (e) {
+        alert('Save failed: ' + e.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('premisesFileInput').addEventListener('change', async (e) => {
+      const input = e.target;
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch(API + '/api/meters/import-premises', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.success) {
+          alert('Imported ' + (data.added ?? 0) + ' meter(s) from premises XML.');
+          loadMeters(false);
+        } else {
+          alert('Import failed: ' + (data.error || ''));
+        }
+      } catch (err) {
+        alert('Upload failed: ' + err.message);
+      }
+      input.value = '';
+    });
+
+    loadMeters();
+  </script>
+</body>
+</html>
