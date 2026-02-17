@@ -10,18 +10,18 @@ Fair warning: This is a rapid prototype, please direct code complaints to the AI
 
 The server implements part of the **OMS MultiSpeak v4.1** specification ( `OMS_Multispeak_v41.wsdl`), the following features are supported:
 - Multispeak Methods:
-- - `PingURL`, `GetMethods`
-- - `InitiateOutageDetectionEventRequest`, `ODEventNotification`
-- - `InitiateMeterReadingsByMeterID`, `ReadingChangedNotification`
-- - `MeterEventNotification`
-- **In-memory meter store**: virtual meters that store Power status, Communication status, and a list of readings (timestamp + value).  Meter store can be populated from a Premise.xml import file, or updated via the REST API.
-- **Simulation web UI**: manage meters and send unsolicited messages to OMS.
+  - `PingURL`, `GetMethods`
+  - `InitiateOutageDetectionEventRequest`, `ODEventNotification`
+  - `InitiateMeterReadingsByMeterID`, `ReadingChangedNotification`
+  - `MeterEventNotification`
+- **In-memory meter store**: virtual meters that store Power status, Communication status, and a list of measurements.  Meter store can be populated from an OSI Premise.xml import file, or updated via the REST API.
+- **Web UI**: manage meters and send unsolicited messages to OMS.
 
 ![Server UI](doc/server-ui.png)
 
 ## Configuration
 
-In `appsettings.json`, configure your OMS server and multispeak path, e.g.
+In `appsettings.json`, configure the OMS server and multispeak path, e.g.
 
 ```json
 {
@@ -56,6 +56,8 @@ Default endpoints:
 
 The Meter Store can be populated manually by using the UI, from an OMS Premises XML file, or via the REST API. The Meter Store can be persisted by using the Save database function, or via the REST API.  The store is written to meters.json in the project folder.
 
+Use the Simuation UI to edit meter data, and send unsolicited messages to OMS.
+
 ## REST API
 There is a Rest API for interacting with the Meter Store and sending unsolicited commands to OMS.  Refer to Swagger for details.
 
@@ -64,8 +66,14 @@ There is a Rest API for interacting with the Meter Store and sending unsolicited
 A minimum viable OMS Multispeak configuration is summarized follows:
 ![Server UI](doc/oms-config.png)
 
+PremiseServiceType objects must have the Meter ID and AMI System ID set before they will be used with AMI integration.  Set these values via the OMS API, or via Premise XML import.
+
 ## Methods
 
 TODO
 
-v
+## Roadmap
+- Tidy up error handling and logging
+- TLS configuration and certificate management
+- Add callbacks and events to allow integration with other services, such as third party APIs
+- Customizable meter reading fields
