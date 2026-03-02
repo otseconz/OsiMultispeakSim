@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using System.Xml.Serialization;
 
-namespace Multispeak.Server.Contracts;
+namespace MultiSpeak.Server.Contracts;
 
 public static class MultiSpeakNs
 {

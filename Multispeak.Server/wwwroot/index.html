@@ -210,7 +210,8 @@
       <table>
         <thead>
             <tr>
-                <th>Meter #</th>
+                <th>ICP</th>
+                <th>SerialNo.</th>
                 <th class="col-hidden">Service</th>
                 <th>Power</th>
                 <th>Comms</th>
@@ -234,11 +235,16 @@
     <div class="modal-inner">
       <h3 id="modalTitle">Add meter</h3>
       <form id="meterForm">
-          <input type="hidden" id="meterNo" />
+          <input type="hidden" id="meterId" />
           <div class="form-row">
               <div>
-                  <label for="objectId">Object ID</label>
-                  <input type="text" id="objectId" />
+                  <label for="icp">ICP</label>
+                  <input type="text" id="icp" />
+              </div>
+
+              <div>
+                  <label for="serialNumber">Serial Number</label>
+                  <input type="text" id="serialNumber" />
               </div>
           </div>
           <div class="form-row">
@@ -259,11 +265,11 @@
           <div class="form-row">
               <div>
                   <label for="voltageReading">Voltage (V)</label>
-                  <input type="number" id="voltageReading" step="0.01" value="0" placeholder="Optional"/>
+                  <input type="number" id="voltageReading" step="0.01" value="0" placeholder="Optional" />
               </div>
               <div>
                   <label for="currentReading">Current (A)</label>
-                  <input type="number" id="currentReading" step="0.01" value="0" placeholder="Optional"/>
+                  <input type="number" id="currentReading" step="0.01" value="0" placeholder="Optional" />
               </div>
           </div>
           <div class="form-row">
@@ -311,7 +317,8 @@
     function renderMeterRow(m) {
       return `
         <tr>
-          <td class="mono">${escape(m.meterNo)}</td>
+          <td class="mono">${escape(m.icp)}</td>
+          <td class="mono">${escape(m.serialNumber)}</td>
 
           <td class="col-hidden">${escape(m.serviceType)}</td>
 
@@ -325,11 +332,11 @@
           <td>${m.lastReadingTime ? new Date(m.lastReadingTime).toLocaleString() : '–'}</td>
           <td>
             <div class="actions">
-            <button type="button" class="btn btn-ghost" data-edit="${escape(m.meterNo)}">Edit</button>
-            <button type="button" class="btn btn-danger" data-delete="${escape(m.meterNo)}">Delete</button>
-            <button type="button" class="btn btn-ghost btn-sm" data-od-event="${escape(m.meterNo)}" title="Send Outage Detection Event Notification">OD Event</button>
-            <button type="button" class="btn btn-ghost btn-sm" data-meter-event="${escape(m.meterNo)}" title="Send Meter Event Notification">Meter Event</button>
-            <button type="button" class="btn btn-ghost btn-sm" data-reading-changed="${escape(m.meterNo)}" title="Send Reading Changed Notification">Reading</button>  
+            <button type="button" class="btn btn-ghost" data-edit="${escape(m.id)}">Edit</button>
+            <button type="button" class="btn btn-danger" data-delete="${escape(m.id)}">Delete</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-od-event="${escape(m.id)}" title="Send Outage Detection Event Notification">OD Event</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-meter-event="${escape(m.id)}" title="Send Meter Event Notification">Meter Event</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-reading-changed="${escape(m.id)}" title="Send Reading Changed Notification">Reading</button>  
             </div>
           </td>
         </tr>
@@ -444,37 +451,40 @@
     }
 
     function openAdd() {
-      document.getElementById('modalTitle').textContent = 'Add meter';
-      document.getElementById('meterForm').reset();
-      document.getElementById('meterId').value = '';
-      document.getElementById('meterNo').required = true;
-      document.getElementById('modal').classList.add('open');
+        document.getElementById('modalTitle').textContent = 'Add meter';
+        document.getElementById('meterForm').reset();
+        document.getElementById('meterId').value = '';
+
+        document.getElementById('icp').value = '';
+        document.getElementById('icp').required = true;
+        document.getElementById('modal').classList.add('open');
     }
 
     async function openEdit(id) {
-      const res = await fetch(API + '/api/meters/' + encodeURIComponent(id));
-      if (!res.ok) return;
-      const m = await res.json();
-      document.getElementById('modalTitle').textContent = 'Edit meter';
-      document.getElementById('meterNo').value = m.meterNo;
-      document.getElementById('objectId').value = m.objectId || '';
-      document.getElementById('serviceType').value = m.serviceType || 'Electric';
-      document.getElementById('utility').value = m.utility || '';
+        const res = await fetch(API + '/api/meters/' + encodeURIComponent(id));
+        if (!res.ok) return;
+        const m = await res.json();
+        document.getElementById('modalTitle').textContent = 'Edit meter';
+        document.getElementById('meterId').value = m.id;
+        document.getElementById('icp').value = m.icp;
+        document.getElementById('serialNumber').value = m.serialNumber || '';
+        document.getElementById('serviceType').value = m.serviceType || 'Electric';
+        document.getElementById('utility').value = m.utility || '';
         document.getElementById('voltageReading').value = m.voltageReading ?? '';
         document.getElementById('currentReading').value = m.currentReading ?? '';
         document.getElementById('activePowerReading').value = m.activePowerReading ?? '';
         document.getElementById('reactivePowerReading').value = m.reactivePowerReading ?? '';
         document.getElementById('isOnline').value = m.isOnline !== false ? 'true' : 'false';
         document.getElementById('commsStatus').value = m.commsStatus !== false ? 'true' : 'false';
-      document.getElementById('modal').classList.add('open');
+        document.getElementById('modal').classList.add('open');
     }
 
     document.getElementById('meterForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const id = document.getElementById('meterNo').value;
         const payload = {
-            meterNo: document.getElementById('meterNo').value.trim(),
-            objectId: document.getElementById('objectId').value.trim() || null,
+            id: document.getElementById('meterId').value || null,
+            icp: document.getElementById('icp').value.trim(),
+            serialNumber: document.getElementById('serialNumber').value.trim() || null,
             serviceType: document.getElementById('serviceType').value,
             utility: document.getElementById('utility').value.trim() || null,
             voltageReading: document.getElementById('voltageReading').value.trim() ? parseFloat(document.getElementById('voltageReading').value) : null,
@@ -547,6 +557,13 @@
       }
       input.value = '';
     });
+
+    // Apply filter from URL parameter (e.g. ?filter=ICP123 or ?q=Electric)
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterFromUrl = urlParams.get('filter') ?? urlParams.get('q');
+    if (filterFromUrl != null && filterFromUrl !== '') {
+      document.getElementById('meterFilter').value = filterFromUrl;
+    }
 
     loadMeters();
   </script>

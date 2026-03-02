@@ -1,4 +1,4 @@
-namespace Multispeak.Server.Configuration;
+namespace MultiSpeak.Server.Configuration;
 
 /// <summary>
 /// Configuration for the "other end" (client) when the simulator sends callback requests
@@ -21,7 +21,7 @@ public class MultiSpeakClientOptions
     /// <summary>Company name sent in MultiSpeakMsgHeader on outbound callbacks (protocol-level).</summary>
     public string? Company { get; set; }
 
-    /// <summary>Path to the MultiSpeak SOAP endpoint relative to BaseUrl (default /Multispeak).</summary>
+    /// <summary>Path to the MultiSpeak SOAP endpoint relative to BaseUrl (default /MultiSpeak).</summary>
     public string? MultiSpeakPath { get; set; }
 
 }

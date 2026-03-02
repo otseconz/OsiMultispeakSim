@@ -1,10 +1,10 @@
 
 using Microsoft.Extensions.Options;
-using Multispeak.Server.Contracts;
+using MultiSpeak.Server.Contracts;
 using System.ServiceModel;
-using Multispeak.Server.Configuration;
+using MultiSpeak.Server.Configuration;
 
-namespace Multispeak.Server.Services;
+namespace MultiSpeak.Server.Services;
 
 public class MultiSpeakClient(ChannelFactory<IOMS_MultiSpeak_v41_Soap> factory, IOptions<MultiSpeakClientOptions> options)
 {

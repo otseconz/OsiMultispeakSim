@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Multispeak.Server\MultiSpeak.Server.csproj" />
+  </ItemGroup>
+
+  <Target Name="CopyToServerPluginFolder" AfterTargets="Build">
+    <PropertyGroup>
+      <ServerPluginPath>$(MSBuildThisFileDirectory)..\..\MultiSpeak\MultiSpeak.Server\bin\$(Configuration)\$(TargetFramework)\plugins</ServerPluginPath>
+    </PropertyGroup>
+    <MakeDir Directories="$(ServerPluginPath)" Condition="!Exists('$(ServerPluginPath)')" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ServerPluginPath)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).pdb" DestinationFolder="$(ServerPluginPath)" Condition="Exists('$(OutputPath)$(AssemblyName).pdb')" />
+  </Target>
+
+</Project>

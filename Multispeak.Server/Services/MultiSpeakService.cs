@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Options;
-using Multispeak.Server.Configuration;
-using Multispeak.Server.Contracts;
-using Multispeak.Server.Models;
+using MultiSpeak.Server.Configuration;
+using MultiSpeak.Server.Contracts;
+using MultiSpeak.Server.Models;
+using System.Collections.Concurrent;
 
-namespace Multispeak.Server.Services;
+namespace MultiSpeak.Server.Services;
 
 public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
 {
@@ -36,6 +37,22 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
 
     }
 
+    private Dictionary<string, IMultiSpeakRequestHandler> _handlers = new();
+
+
+    public void RegisterHandler(string provider, IMultiSpeakRequestHandler handler)
+    {
+        _handlers.Add(provider, handler);
+    }
+
+    private IMultiSpeakRequestHandler? GetHandler(string? provider)
+    {
+        if (provider != null && _handlers.TryGetValue(provider, out var handler))
+            return handler;
+        _handlers.TryGetValue("*", out handler);
+        return handler;
+    }
+
     #region Not used
 
     public PingURLResponse PingURL(PingURLRequest request) => new()
@@ -53,24 +70,57 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
 
     #endregion
 
-
     #region Incoming Requests
     public InitiateOutageDetectionEventRequestResponse InitiateOutageDetectionEventRequest(InitiateOutageDetectionEventRequestRequest request)
     {
         var errors = new List<ErrorObject>();
-        
-        var meterIds = new List<string>();
+        ConcurrentDictionary<IMultiSpeakRequestHandler, List<Meter>> providers = new();
 
+        //loop through the meters in the request, find the provider for each meter, and group them by provider so we can send one request per provider.
+        //If a meter doesn't have a provider, we'll use the default handler (if it exists)
         foreach (var m in request.meterIDs?.meterID ?? Enumerable.Empty<MeterId?>())
         {
             if (m?.meterNo != null)
             {
-                meterIds.Add(m.meterNo);
+                var meter = _meterStore.GetById(m.meterNo);
+                if (meter != null)
+                {
+                    var handler = GetHandler(meter.Provider);
+                    if (handler != null)
+                    {
+                        if (!providers.ContainsKey(handler))
+                            providers[handler] = new List<Meter>();
+                        providers[handler].Add(meter);
+                    }
+
+                    //else
+                    //TODO: add an error here?
+                }
             }
         }
 
-        _ = SendOdEventNotificationAsync(meterIds, request.transactionID);
-        
+        //Send the requests to each provider in parallel, and collect the results.
+        Task.Run(() =>
+        {
+            var events = new List<OutageDetectionEvent?>();
+
+            //TODO: we probably need a timeout here, we don't want to wait forever for all the providers to respond
+            //TODO: is it allowable to respond in multiple payloads??  Then we don't have to aggregate?  To investigate
+            Parallel.ForEach(providers, kvp =>
+            {
+                events.AddRange(kvp.Key.InitiateOutageDetectionEventRequest(kvp.Value));
+            });
+            
+            var notification = new ODEventNotificationRequest
+            {
+                ODEvents = new ArrayOfOutageDetectionEvent { outageDetectionEvent = events },
+                transactionID = request.transactionID
+            };
+
+            //TODO: we should log the response somewhere?
+            _client.ODEventNotification(notification);
+        });
+
         return new InitiateOutageDetectionEventRequestResponse
         {
             InitiateOutageDetectionEventRequestResult = new ArrayOfErrorObject { errorObject = errors }
@@ -80,18 +130,52 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
     public InitiateMeterReadingsByMeterIDResponse InitiateMeterReadingsByMeterID(InitiateMeterReadingsByMeterID request)
     {
         var errors = new List<ErrorObject>();
-        var meterIds = new List<string>();
-
+        ConcurrentDictionary<IMultiSpeakRequestHandler, List<Meter>> providers = new();
+        
+        //loop through the meters in the request, find the provider for each meter, and group them by provider so we can send one request per provider.
+        //If a meter doesn't have a provider, we'll use the default handler (if it exists)
         foreach (var m in request.meterIDs?.meterID ?? Enumerable.Empty<MeterId?>())
         {
             if (m?.meterNo != null)
             {
-                meterIds.Add(m.meterNo);
+                var meter = _meterStore.GetById(m.meterNo);
+                if (meter != null)
+                {
+                    var handler = GetHandler(meter.Provider);
+                    if (handler != null)
+                    {
+                        if (!providers.ContainsKey(handler))
+                            providers[handler] = new List<Meter>();
+                        providers[handler].Add(meter);
+                    }
+
+                    //else
+                    //TODO: add an error here?
+                }
             }
         }
-        
-        if (meterIds.Count > 0)
-            _ = SendReadingChangedAsync(meterIds, request.transactionID);
+
+        //Send the requests to each provider in parallel, and collect the results.
+        Task.Run(() =>
+        {
+            var events = new List<MeterReading?>();
+
+            //TODO: we probably need a timeout here, we don't want to wait forever for all the providers to respond
+            //TODO: is it allowable to respond in multiple payloads??  Then we don't have to aggregate?  To investigate
+            Parallel.ForEach(providers, kvp =>
+            {
+                events.AddRange(kvp.Key.InitiateMeterReadingsByMeterID(kvp.Value));
+            });
+
+            var readings = new ReadingChangedNotificationRequest()
+            {
+                changedMeterReads = new ArrayOfMeterReading1() { meterReading = events },
+                transactionID = request.transactionID
+            };
+
+            //TODO: we should log the response somewhere?
+            _client.ReadingChangedNotification(readings);
+        });
 
         return new InitiateMeterReadingsByMeterIDResponse
         {
@@ -133,143 +217,62 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
 
     #endregion
 
-    #region Async Client Requests
-    public Task<ODEventNotificationResponse> SendOdEventNotificationAsync(List<string> meterIds, string? transactionID = null)
-    {
-        return Task.Run(() =>
-        {
-            var events = new List<OutageDetectionEvent?>();
-            var eventTime = DateTime.UtcNow;
-            transactionID ??= Guid.NewGuid().ToString("N");
+    #region Unsolocited requests
+    //these are used both by the simulator plugin, and also directly from the API
 
-            if (meterIds.Count > 0)
+    public void InitiateOutageDetectionEventRequest(string meterId)
+    {
+        var meter = _meterStore.GetById(meterId);
+        if (meter == null)
+            return;
+       
+        var events = InitiateOutageDetectionEventRequest([meter]);
+        var notification = new ODEventNotificationRequest
+        {
+            ODEvents = new ArrayOfOutageDetectionEvent { outageDetectionEvent = events },
+            transactionID = Guid.NewGuid().ToString("N")
+        };
+        _client.ODEventNotification(notification);
+    }
+
+    public List<OutageDetectionEvent> InitiateOutageDetectionEventRequest(List<Meter> meters)
+    {
+        var eventTime = DateTime.UtcNow;
+
+        return meters.Select(meter => new OutageDetectionEvent
+        {
+            eventTime = eventTime,
+            outageEventType = meter.IsOnline ? "Restoration" : "Outage",
+            phaseCode = meter.Phases ?? "ABC",
+            outageLocation = new OutageLocation()
             {
-                foreach (var mid in meterIds)
+                meterID = new MeterId()
                 {
-                    var meter = _meterStore.GetByMeterNo(mid);
-                    //TODO: add an error here?
-                    if (meter == null)
-                        continue;
-                    events.Add(new OutageDetectionEvent
-                    {
-                        eventTime = eventTime,
-                        outageEventType = meter.IsOnline ? "Restoration" : "Outage",
-                        phaseCode = meter.Phases ?? "ABC",
-                        outageLocation = new OutageLocation()
-                        {
-                            meterID = new MeterId()
-                            {
-                                meterNo = meter.MeterNo,
-                                serviceType = "Electric"
-                            }
-                        }
-                    });
+                    meterNo = meter.Icp,
+                    serviceType = "Electric"
                 }
             }
-
-            if (events.Count == 0)
-                events.Add(new OutageDetectionEvent { eventTime = eventTime, outageEventType = "Outage", comments = "Simulated outage detection event" });
-
-            var notification = new ODEventNotificationRequest
-            {
-                ODEvents = new ArrayOfOutageDetectionEvent { outageDetectionEvent = events },
-                transactionID = transactionID
-            };
-            return _client.ODEventNotification(notification);
-        });
+        }).ToList();
     }
 
-    public Task<ReadingChangedNotificationResponse?> SendReadingChangedAsync(List<string> meterIds, string? transactionID = null)
+    public void InitiateMeterReadingsByMeterID(string meterId)
     {
-        return Task.Run(() =>
+        var meter = _meterStore.GetById(meterId);
+        if (meter == null)
+            return;
+
+        var readings = InitiateMeterReadingsByMeterID([meter]);
+        var notification = new ReadingChangedNotificationRequest()
         {
-            if (meterIds.Count == 0)
-            {
-                return null;
-                //errors.Add(new ErrorObject { errorString = "No meter IDs provided." });
-                //return new InitiateMeterReadingsByMeterIDResponse
-                //{
-                  //  InitiateMeterReadingsByMeterIDResult = new ArrayOfErrorObject { errorObject = errors }
-                //};
-            }
-
-            var readings = new List<MeterReading?>();
-            foreach (var mid in meterIds)
-            {
-                Meter? meter = _meterStore.GetByMeterNo(mid);
-
-                if (meter == null)
-                {
-                    //errors.Add(new ErrorObject { objectID = mid.objectID ?? mid.meterNo, errorString = "Meter not found." });
-                    //TODO: throw an error
-                    continue;
-                }
-
-                readings.Add(MeterToReading(meter));
-            }
-
-            transactionID ??= Guid.NewGuid().ToString("N");
-
-            var payload = new ReadingChangedNotificationRequest
-            {
-                changedMeterReads = new ArrayOfMeterReading1 { meterReading = readings },
-                transactionID = transactionID
-            };
-
-            return _client.ReadingChangedNotification(payload);
-        });
+            changedMeterReads = new ArrayOfMeterReading1() { meterReading = readings },
+            transactionID = Guid.NewGuid().ToString("N")
+        };
+        _client.ReadingChangedNotification(notification);
     }
 
-    public Task<MeterEventNotificationResponse?> SendMeterEventNotificationAsync(string meterId, string? transcationID = null)
+    public List<MeterReading> InitiateMeterReadingsByMeterID(List<Meter> meters)
     {
-        return Task.Run(() =>
-        {
-            var meter = _meterStore.GetByMeterNo(meterId);
-            if (meter == null)
-                return null;
-            var request = new MeterEventNotificationRequest()
-            {
-                events = new MeterEventList()
-                {
-
-                    eventInstances = new ArrayOfEventInstance()
-                    {
-                        eventInstance =
-                        [
-                            new EventInstance
-                            {
-                                meterID = new MeterId()
-                                {
-                                    meterNo = meter.MeterNo,
-                                    serviceType = meter.ServiceType
-                                },
-                                meterEvent = new MeterEvent()
-                                {
-                                    type = "Status",
-                                    value = meter.CommsStatus ? "Normal" : "Non-Responsive",
-                                },
-                                timeStamp = DateTime.UtcNow
-                            }
-                        ]
-                    }
-                },
-                transactionID = Guid.NewGuid().ToString("N")
-            };
-
-            return _client.MeterEventNotification(request);
-        });
-    }
-    #endregion
-
-    #region Helpers
-
-
-
-    /// <summary>Build meter readings for sending ReadingChangedNotification (e.g. from web UI).</summary>
-    public MeterReading? GetReadingsForMeter(string meterNo)
-    {
-        var meter = _meterStore.GetByMeterNo(meterNo);
-        return meter != null ? MeterToReading(meter) : null;
+        return meters.Select(meter => MeterToReading(meter)).ToList();
     }
 
     private static MeterReading MeterToReading(Meter meter)
@@ -287,19 +290,58 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
 
         return new MeterReading
         {
-            objectID = meter.MeterNo,
+            objectID = meter.Icp,
             meterID = new MeterId
             {
-                Value = meter.MeterNo,
-                meterNo = meter.MeterNo,
-                objectID = meter.ObjectId,
+                Value = meter.Icp,
+                meterNo = meter.Icp,
+                objectID = meter.Id,
                 serviceType = meter.ServiceType,
                 utility = meter.Utility
             },
-            deviceID = meter.MeterNo,
+            deviceID = meter.Icp,
             readingValues = new ArrayOfReadingValue { readingValue = rv }
         };
     }
 
-    #endregion
+    public void InitiateMeterEventRequest(string meterId)
+    {
+        var meter = _meterStore.GetById(meterId);
+        if (meter == null)
+            return;
+
+        var events = InitiateMeterEventRequest([meter]);
+        var notification = new MeterEventNotificationRequest()
+        {
+            events = new MeterEventList()
+            {
+                eventInstances = new ArrayOfEventInstance()
+                {
+                    eventInstance = events
+                }
+            },
+            transactionID = Guid.NewGuid().ToString("N")
+        };
+        _client.MeterEventNotification(notification);
+    }
+
+    public List<EventInstance> InitiateMeterEventRequest(List<Meter> meters)
+    {
+        return meters.Select(meter => new EventInstance
+        {
+            meterID = new MeterId()
+            {
+                meterNo = meter.Icp,
+                serviceType = meter.ServiceType
+            },
+            meterEvent = new MeterEvent()
+            {
+                type = "Status",
+                value = meter.CommsStatus ? "Online" : "Offline",
+            },
+            timeStamp = DateTime.UtcNow
+        }).ToList();
+    }
+
+#endregion
 }

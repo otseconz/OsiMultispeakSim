@@ -1,14 +1,19 @@
-namespace Multispeak.Server.Models;
+namespace MultiSpeak.Server.Models;
 
 /// <summary>
 /// In-memory virtual meter state for simulation.
 /// </summary>
 public class Meter
 {
-    public string MeterNo { get; set; } = string.Empty;
-    public string? ObjectId { get; set; }
+    
+    public string Icp { get; set; } = string.Empty;
+    public string? Id { get; set; }
+    public string? SerialNumber { get; set; }
+
     public string ServiceType { get; set; } = "Electric";
     public string? Utility { get; set; }
+
+    public string? Provider { get; set; }
     
     /// <summary>Phase code (e.g. A, AB, ABC).</summary>
     public string? Phases { get; set; }
@@ -27,4 +32,12 @@ public class Meter
 
     public bool CommsStatus { get; set; } = true;
 
+    public double? Lat { get; set; }
+
+    public double? Lon { get; set; }
+
+    public override string ToString()
+    {
+        return $"ICP:{Icp}, Serial:{SerialNumber}";
+    }
 }

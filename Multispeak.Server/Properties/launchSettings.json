@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Multispeak.Server": {
+    "MultiSpeak.Server": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

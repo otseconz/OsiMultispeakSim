@@ -364,3 +364,5 @@ FodyWeavers.xsd
 /src/MultispeakSim.Server/meters.json
 /Multispeak.PremiseUpdate
 /Multispeak.Server/meters.json
+/MultiSpeak.Server/smartco_events.sqlite
+/MultiSpeak.Server/appsettings.Development.json
