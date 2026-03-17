@@ -31,6 +31,7 @@ builder.Logging.AddFile(o =>
 {
     o.LogDirectory = "logs";
     o.FileNamePrefix = "multispeak";
+    o.MinimumLevel = LogLevel.Debug;
 });
 
 builder.Services.AddHttpContextAccessor(); //can probably get rid of this soon
@@ -80,7 +81,7 @@ var pluginSection = builder.Configuration.GetSection("Plugins");
 var pluginAssemblyPaths = pluginSection.Get<string[]>() ?? Array.Empty<string>();
 
 var pluginsFolder = Path.Combine(AppContext.BaseDirectory, "plugins");
-
+var pluginLog = Path.Combine(pluginsFolder, "pluginErrors.txt");
 foreach (var pluginDll in pluginAssemblyPaths.Where(p => !string.IsNullOrWhiteSpace(p)))
 {
     try
@@ -89,7 +90,9 @@ foreach (var pluginDll in pluginAssemblyPaths.Where(p => !string.IsNullOrWhiteSp
 
         if (!File.Exists(path))
         {
+
             Console.WriteLine($"Plugin assembly not found at '{path}', skipping.");
+            File.AppendAllText(pluginLog, $"Plugin assembly not found at '{path}', skipping.");
             continue;
         }
 
@@ -110,10 +113,12 @@ foreach (var pluginDll in pluginAssemblyPaths.Where(p => !string.IsNullOrWhiteSp
     catch (Exception ex)
     {
         Console.WriteLine($"Failed to load plugin assembly '{pluginDll}': {ex.Message}");
+        File.AppendAllText(pluginLog, $"Failed to load plugin assembly '{pluginDll}': {ex.Message}");
     }
 }
 
 var app = builder.Build();
+var logger = app.Services.GetService<ILogger<Program>>();
 
 var metersPath = Path.Combine(app.Environment.ContentRootPath, "meters.json");
 
@@ -170,8 +175,7 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Exception ex)
         {
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-            logger.LogWarning(ex, "Could not restore meters from {Path}", metersPath);
+            logger?.LogWarning(ex, "Could not restore meters from {Path}", metersPath);
         }
     }
 }
@@ -181,11 +185,11 @@ foreach (var plugin in plugins)
 {
     try
     {
+        logger?.LogInformation("Running BeforeRun for plugin {PluginType}", plugin.GetType().FullName);
         plugin.BeforeRun(app);
     }
     catch (Exception ex)
     {
-        var logger = app.Services.GetService<ILogger<Program>>();
         logger?.LogError(ex, "Error running BeforeRun for plugin {PluginType}", plugin.GetType().FullName);
     }
 }

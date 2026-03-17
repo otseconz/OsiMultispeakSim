@@ -39,7 +39,8 @@ namespace MultiSpeak.Sim
         {
             _logger = logger;
             _service = service;
-            _service.RegisterHandler("*", this);
+            _service.RegisterHandler("*", MultiSpeakRequestType.MeterReadingsByMeterID, this);
+            _service.RegisterHandler("*", MultiSpeakRequestType.OutageDetectionEvent, this);
         }
 
         public List<OutageDetectionEvent> InitiateOutageDetectionEventRequest(List<Meter> meters)

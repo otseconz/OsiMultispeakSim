@@ -166,6 +166,8 @@ public static class MeterEndpoints
                 var services = premise.Elements().FirstOrDefault(e => e.Name.LocalName == "services");
                 double? lat = double.TryParse(premise.Attribute("geoY")?.Value, out var l1) ? l1 : null;
                 double? lon = double.TryParse(premise.Attribute("geoX")?.Value, out var l2) ? l2 : null;
+                string? provider = premise.Descendants("customField").FirstOrDefault(e => e.Attribute("key")?.Value == "meteringProvider")?.Attribute("value")?.Value?.Trim();
+                
                 if (services == null) continue;
                 foreach (var service in services.Elements().Where(e => e.Name.LocalName == "service"))
                 {
@@ -176,6 +178,7 @@ public static class MeterEndpoints
                     var serviceType = typeAttr?.Value?.Trim() ?? "Electric";
                     var phasesAttr = service.Attribute("phases");
                     var phaseCode = PhasesToPhaseCode(phasesAttr?.Value);
+                    
                     var meter = new Meter
                     {
                         Icp = meterId,
@@ -183,13 +186,15 @@ public static class MeterEndpoints
                         ServiceType = serviceType,
                         Phases = phaseCode,
                         VoltageReading = 0,
+                        Provider = provider,
                         ActivePowerReading = 0,
                         ReactivePowerReading = 0,
                         CurrentReading = 0,
                         LastReadingTime = DateTime.UtcNow,
                         IsOnline = true,
                         Lat = lat,
-                        Lon = lon
+                        Lon = lon,
+                        SerialNumber = store.GetById(meterId)?.SerialNumber ?? null
                     };
                     store.AddOrUpdate(meter);
                     added++;

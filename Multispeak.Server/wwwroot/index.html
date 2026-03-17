@@ -258,8 +258,8 @@
                   </select>
               </div>
               <div>
-                  <label for="utility">Utility</label>
-                  <input type="text" id="utility" />
+                  <label for="provider">Provider</label>
+                  <input type="text" id="provider" />
               </div>
           </div>
           <div class="form-row">
@@ -469,7 +469,7 @@
         document.getElementById('icp').value = m.icp;
         document.getElementById('serialNumber').value = m.serialNumber || '';
         document.getElementById('serviceType').value = m.serviceType || 'Electric';
-        document.getElementById('utility').value = m.utility || '';
+        document.getElementById('provider').value = m.provider || '';
         document.getElementById('voltageReading').value = m.voltageReading ?? '';
         document.getElementById('currentReading').value = m.currentReading ?? '';
         document.getElementById('activePowerReading').value = m.activePowerReading ?? '';
@@ -486,7 +486,7 @@
             icp: document.getElementById('icp').value.trim(),
             serialNumber: document.getElementById('serialNumber').value.trim() || null,
             serviceType: document.getElementById('serviceType').value,
-            utility: document.getElementById('utility').value.trim() || null,
+            provider: document.getElementById('provider').value.trim() || null,
             voltageReading: document.getElementById('voltageReading').value.trim() ? parseFloat(document.getElementById('voltageReading').value) : null,
             currentReading: document.getElementById('currentReading').value.trim() ? parseFloat(document.getElementById('currentReading').value) : null,
             activePowerReading: document.getElementById('activePowerReading').value.trim() ? parseFloat(document.getElementById('activePowerReading').value) : null,

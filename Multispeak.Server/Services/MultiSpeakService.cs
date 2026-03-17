@@ -37,19 +37,20 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
 
     }
 
-    private Dictionary<string, IMultiSpeakRequestHandler> _handlers = new();
+    private Dictionary<(string provider, MultiSpeakRequestType requestTypes), IMultiSpeakRequestHandler> _handlers = new();
 
 
-    public void RegisterHandler(string provider, IMultiSpeakRequestHandler handler)
+    public void RegisterHandler(string provider, MultiSpeakRequestType requestType, IMultiSpeakRequestHandler handler)
     {
-        _handlers.Add(provider, handler);
+        //TODO: validate
+        _handlers.Add((provider, requestType), handler);
     }
 
-    private IMultiSpeakRequestHandler? GetHandler(string? provider)
+    private IMultiSpeakRequestHandler? GetHandler(string? provider, MultiSpeakRequestType requestType)
     {
-        if (provider != null && _handlers.TryGetValue(provider, out var handler))
+        if (provider != null && _handlers.TryGetValue((provider, requestType), out var handler))
             return handler;
-        _handlers.TryGetValue("*", out handler);
+        _handlers.TryGetValue(("*", requestType), out handler);
         return handler;
     }
 
@@ -85,7 +86,7 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
                 var meter = _meterStore.GetById(m.meterNo);
                 if (meter != null)
                 {
-                    var handler = GetHandler(meter.Provider);
+                    var handler = GetHandler(meter.Provider, MultiSpeakRequestType.OutageDetectionEvent);
                     if (handler != null)
                     {
                         if (!providers.ContainsKey(handler))
@@ -141,7 +142,7 @@ public class MultiSpeakService : IOMS_MultiSpeak_v41_Soap
                 var meter = _meterStore.GetById(m.meterNo);
                 if (meter != null)
                 {
-                    var handler = GetHandler(meter.Provider);
+                    var handler = GetHandler(meter.Provider, MultiSpeakRequestType.MeterReadingsByMeterID);
                     if (handler != null)
                     {
                         if (!providers.ContainsKey(handler))
